@@ -16,16 +16,64 @@ app.use((req, res, next) => {
 
 // 라우터
 // Client 또는 F-E에서 End Point로 HTTP GET 요청을 할 수 있다.
-app.get('/', (req: express.Request, res: express.Response) => {
-  res.send({cats: Cat});
+// READ 고양이 전체 데이터 다 조회 API
+app.get('/cats', (req: express.Request, res: express.Response) => {
+    try {
+        const cats = Cat;
+        res.status(200).send({
+            success: true,
+            data: {
+                cats,
+            },
+        });
+    } catch (error) {
+        res.status(400).send({
+            success: false,
+            error: error.message
+        });
+    }
 });
 
-app.get('/cats/blue', (req: express.Request, res: express.Response) => {
-  res.send({blue: Cat[0]});
+// READ 특정 고양이 데이터 조회 API
+app.get('/cats/:id', (req: express.Request, res: express.Response) => {
+    try {
+        const params = req.params;
+        const cat = Cat.find((cat) => {
+            return cat.id === params.id;
+        });
+        res.status(200).send({
+            success: true,
+            data: {
+                cat,
+            },
+        });
+    } catch (error) {
+        res.status(400).send({
+            success: false,
+            error: error.message
+        });
+    }
 });
 
-app.get('/cats/som', (req: express.Request, res: express.Response) => {
-  res.send({som: Cat[1]});
+// JSON middleWare
+app.use(express.json());
+
+// CREATE 고양이 데이터 추가 API
+app.post('/cats', (req: express.Request, res: express.Response) => {
+    try {
+        const data = req.body;
+        console.log(data);
+        Cat.push(data);
+        res.status(200).send({
+            success: true,
+            data: {},
+        });
+    } catch (error) {
+        res.status(400).send({
+            success: false,
+            error: error.message
+        });
+    }
 });
 
 // 미들웨어는 무조건 경유하기 때문에 잘못된 엔드포인트 요청일 경우의 예외처리도 가능하다.
